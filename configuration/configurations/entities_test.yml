@@ -1,0 +1,60 @@
+Name: Example
+Description: Example YML configuration
+Resources:
+  MyTestResource:
+    TableName: my_test_table
+    PrimaryKey:
+      - my_test_table.id
+    AutoIncrement: true
+    Index:
+      IDX1:
+        - my_test_table.idx1
+      IDX2:
+        - my_test_table.idx1
+        - my_test_table.idx2
+    ForeignKeys:
+      - Type: NORMAL
+        Key: my_test_table.fk1
+        ResourceName: MyTestResource2
+        ForeignKey: my_test_table2.id
+
+  MyTestResource2:
+    TableName: my_test_table2
+    PrimaryKey:
+      - my_test_table2.id
+    AutoIncrement: true
+    Index:
+      IDX1:
+        - my_test_table2.idx1
+      IDX2:
+        - my_test_table2.idx1
+        - my_test_table2.idx2
+Entities:
+  MyTestEntity:
+    Description: This is my test entity
+    Phases:
+      MyTestPhase1:
+        Description: This is a test phase
+        Tasks:
+          TaskA:
+            Resource: MyTestResource
+            Shares: true
+          TaskB:
+            Resource: MyTestResource2
+            SelectionCriteria:
+              Type: Custom
+              Criteria: |
+                1 = 1
+          TaskC:
+            Resource: MyTestResource2
+            SelectionCriteria:
+              Type: Index
+              FromTask: TaskA
+              Index: IDX1
+          TaskD:
+            Resource: MyTestResource3
+            SelectionCriteria:
+              Type: Related
+              Tasks: 
+                - TaskB
+                

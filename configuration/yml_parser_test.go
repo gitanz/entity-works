@@ -188,6 +188,23 @@ func TestConfigurationBuilderParsesYmlWithResourcesEntitiesPhasesAndTasks(t *tes
           IDX2:
             - my_test_table.idx1
             - my_test_table.idx2
+        ForeignKeys:
+          - Type: NORMAL
+            Key: my_test_table.fk1
+            ResourceName: MyTestResource2
+            ForeignKey: my_test_table2.id
+
+      MyTestResource2:
+        TableName: my_test_table2
+        PrimaryKey:
+          - my_test_table2.id
+        AutoIncrement: true
+        Index:
+          IDX1:
+            - my_test_table2.idx1
+          IDX2:
+            - my_test_table2.idx1
+            - my_test_table2.idx2      
     Entities:
       MyTestEntity:
         Description: This is my test entity
@@ -221,10 +238,16 @@ func TestConfigurationBuilderParsesYmlWithResourcesEntitiesPhasesAndTasks(t *tes
 	assert.Nil(t, err)
 	assert.Equal(t, "Example", ymlSchema.Name)
 	assert.Equal(t, "Example YML configuration", ymlSchema.Description)
+
 	assert.Equal(t, "my_test_table", ymlSchema.Resources["MyTestResource"].TableName)
 	assert.ElementsMatch(t, []string{"my_test_table.id"}, ymlSchema.Resources["MyTestResource"].PrimaryKey)
 	assert.True(t, ymlSchema.Resources["MyTestResource"].AutoIncrement)
 	assert.ElementsMatch(t, []string{"my_test_table.idx1"}, ymlSchema.Resources["MyTestResource"].Index["IDX1"])
+
+	assert.Equal(t, "my_test_table2", ymlSchema.Resources["MyTestResource2"].TableName)
+	assert.ElementsMatch(t, []string{"my_test_table2.id"}, ymlSchema.Resources["MyTestResource2"].PrimaryKey)
+	assert.True(t, ymlSchema.Resources["MyTestResource2"].AutoIncrement)
+	assert.ElementsMatch(t, []string{"my_test_table2.idx1"}, ymlSchema.Resources["MyTestResource2"].Index["IDX1"])
 
 	assert.IsType(t, YmlTask{}, ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskA"])
 	assert.Equal(t, "MyTestResource", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskA"].Resource)

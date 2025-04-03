@@ -2,10 +2,10 @@ package main
 
 import "fmt"
 
-func sayHello()  string {
+func sayHello() string {
 	return "Hello"
 }
 
-func main() {	
+func main() {
 	fmt.Println(sayHello())
 }

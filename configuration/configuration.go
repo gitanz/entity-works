@@ -40,32 +40,56 @@ func NewResource(ymlResource YmlResource) *Resource {
 	return resource
 }
 
-type RelatedResources map[string]Resource
+type Relation struct {
+	fromTable string
+	fromKey   string
+	toTable   string
+	toKey     string
+	keyType   string
+}
 
-func NewRelatedResources(resourceMap map[string]Resource) *RelatedResources {
-	var relatedResources RelatedResources = resourceMap
-	return &relatedResources
+func NewRelation(
+	fromTable string,
+	fromKey string,
+	toTable string,
+	toKey string,
+	keyType string,
+) *Relation {
+	return &Relation{
+		fromTable: fromTable,
+		fromKey:   fromKey,
+		toTable:   toTable,
+		toKey:     toKey,
+		keyType:   keyType,
+	}
+}
+
+type Relations map[string]Relation
+
+func NewRelations(relationMap map[string]Relation) *Relations {
+	var relations Relations = relationMap
+	return &relations
 }
 
 type FromRelationship struct {
-	to RelatedResources
+	to Relations
 }
 
-func NewFromRelationship(relatedResources RelatedResources) *FromRelationship {
+func NewFromRelationship(relations Relations) *FromRelationship {
 	fromRelationship := &FromRelationship{
-		to: relatedResources,
+		to: relations,
 	}
 
 	return fromRelationship
 }
 
 type ToRelationship struct {
-	from RelatedResources
+	from Relations
 }
 
-func NewToRelationship(relatedResources RelatedResources) *ToRelationship {
+func NewToRelationship(relations Relations) *ToRelationship {
 	toRelationship := &ToRelationship{
-		from: relatedResources,
+		from: relations,
 	}
 
 	return toRelationship

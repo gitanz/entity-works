@@ -72,28 +72,40 @@ func (configurationBuilder *ConfigurationBuilderYml) Build(filepath string) (*Co
 
 	fromRelationshipMap := make(map[string]FromRelationship)
 	for resourceName, resource := range resources {
-		relatedResources := make(map[string]Resource)
+		relations := make(map[string]Relation)
 		for _, foreignKey := range resource.foreignKeys {
-			relatedResources[foreignKey.foreignResource] = resources[foreignKey.foreignResource]
+			relations[foreignKey.foreignResource] = *NewRelation(
+				resources[resourceName].tableName,
+				foreignKey.key,
+				resources[foreignKey.foreignResource].tableName,
+				foreignKey.foreignKey,
+				foreignKey.keyType,
+			)
 		}
 
-		toRelatedResources := *NewRelatedResources(relatedResources)
-		fromRelationshipMap[resourceName] = *NewFromRelationship(toRelatedResources)
+		toRelations := *NewRelations(relations)
+		fromRelationshipMap[resourceName] = *NewFromRelationship(toRelations)
 	}
 
 	toRelationshipMap := make(map[string]ToRelationship)
-	relatedResources := make(map[string]map[string]Resource)
+	relations := make(map[string]map[string]Relation)
 	for resourceName, resource := range resources {
 		for _, foreignKey := range resource.foreignKeys {
-			if _, exists := relatedResources[foreignKey.foreignResource]; !exists {
-				relatedResources[foreignKey.foreignResource] = make(map[string]Resource)
+			if _, exists := relations[foreignKey.foreignResource]; !exists {
+				relations[foreignKey.foreignResource] = make(map[string]Relation)
 			}
-			relatedResources[foreignKey.foreignResource][resourceName] = resource
+			relations[foreignKey.foreignResource][resourceName] = *NewRelation(
+				resources[resourceName].tableName,
+				foreignKey.key,
+				resources[foreignKey.foreignResource].tableName,
+				foreignKey.foreignKey,
+				foreignKey.keyType,
+			)
 		}
 	}
-	for resourceName, relatedResources := range relatedResources {
-		fromRelatedResources := *NewRelatedResources(relatedResources)
-		toRelationshipMap[resourceName] = *NewToRelationship(fromRelatedResources)
+	for resourceName, relations := range relations {
+		fromRelations := *NewRelations(relations)
+		toRelationshipMap[resourceName] = *NewToRelationship(fromRelations)
 	}
 
 	relationships := *NewRelationships(fromRelationshipMap, toRelationshipMap)

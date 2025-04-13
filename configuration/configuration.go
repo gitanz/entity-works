@@ -109,11 +109,77 @@ func NewRelationships(from map[string]FromRelationship, to map[string]ToRelation
 	return relationships
 }
 
+type SelectionCriteria interface {
+}
+
+type CustomSelectionCriteria struct {
+	criteria string
+}
+
+func NewCustomSelectionCriteria() *CustomSelectionCriteria {
+	return &CustomSelectionCriteria{}
+}
+
+type RelatedSelectionCritiera struct {
+	tasks []Task
+}
+
+func NewRelatedSelectionCriteria() *RelatedSelectionCritiera {
+	return &RelatedSelectionCritiera{}
+}
+
+type IndexedSelectionCriteria struct {
+	tasks []Task
+}
+
+func NewIndexedSelectionCriteria() *IndexedSelectionCriteria {
+	return &IndexedSelectionCriteria{}
+}
+
+type NewIndexedSelectionCritier struct {
+}
+
+type Task struct {
+	resource          Resource
+	selectionCriteria SelectionCriteria
+}
+
+func NewTask(resource Resource) *Task {
+	return &Task{
+		resource: resource,
+	}
+}
+
+type Phase struct {
+	description string
+	tasks       map[string]Task
+}
+
+func NewPhase(description string) *Phase {
+	phase := &Phase{}
+	phase.description = description
+
+	return phase
+}
+
+type Entity struct {
+	description string
+	phases      map[string]Phase
+}
+
+func NewEntity(description string) *Entity {
+	entity := &Entity{}
+	entity.description = description
+
+	return entity
+}
+
 type Configuration struct {
 	name          string
 	description   string
 	resources     map[string]Resource
 	relationships Relationships
+	entities      map[string]Entity
 }
 
 func NewConfiguration() *Configuration {

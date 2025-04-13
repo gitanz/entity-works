@@ -143,7 +143,8 @@ func TestConfigurationBuilderParsesYmlWithEntitiesAndPhasesAndTasks(t *testing.T
                 Resource: MyTestResource2
                 SelectionCriteria:
                   Type: Index
-                  FromTask: TaskA
+                  Tasks: 
+                    - TaskA
                   Index: IDX1
               TaskD:
                 Resource: MyTestResource3
@@ -163,7 +164,7 @@ func TestConfigurationBuilderParsesYmlWithEntitiesAndPhasesAndTasks(t *testing.T
 	assert.Equal(t, "1 = 1\n", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskB"].SelectionCriteria.Criteria)
 
 	assert.Equal(t, "Index", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskC"].SelectionCriteria.Type)
-	assert.Equal(t, "TaskA", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskC"].SelectionCriteria.FromTask)
+	assert.ElementsMatch(t, []string{"TaskA"}, ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskC"].SelectionCriteria.Tasks)
 	assert.Equal(t, "IDX1", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskC"].SelectionCriteria.Index)
 
 	assert.Equal(t, "Related", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskD"].SelectionCriteria.Type)
@@ -225,7 +226,8 @@ func TestConfigurationBuilderParsesYmlWithResourcesEntitiesPhasesAndTasks(t *tes
                 Resource: MyTestResource2
                 SelectionCriteria:
                   Type: Index
-                  FromTask: TaskA
+                  Tasks: 
+                    - TaskA
                   Index: IDX1
               TaskD:
                 Resource: MyTestResource3
@@ -258,7 +260,7 @@ func TestConfigurationBuilderParsesYmlWithResourcesEntitiesPhasesAndTasks(t *tes
 	assert.Equal(t, "1 = 1\n", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskB"].SelectionCriteria.Criteria)
 
 	assert.Equal(t, "Index", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskC"].SelectionCriteria.Type)
-	assert.Equal(t, "TaskA", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskC"].SelectionCriteria.FromTask)
+	assert.ElementsMatch(t, []string{"TaskA"}, ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskC"].SelectionCriteria.Tasks)
 	assert.Equal(t, "IDX1", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskC"].SelectionCriteria.Index)
 
 	assert.Equal(t, "Related", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskD"].SelectionCriteria.Type)

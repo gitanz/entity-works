@@ -22,7 +22,6 @@ type YmlResource struct {
 type YmlSelectionCriteria struct {
 	Type     string   `yaml:"Type"`
 	Criteria string   `yaml:"Criteria,omitempty"`
-	FromTask string   `yaml:"FromTask,omitempty"`
 	Tasks    []string `yaml:"Tasks,omitempty"`
 	Index    string   `yaml:"Index,omitempty"`
 }

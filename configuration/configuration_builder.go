@@ -1,7 +1,6 @@
 package configuration
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -12,8 +11,8 @@ func init() {
 	CONFIGURATION_PATH = dir + "/configurations"
 }
 
-type ConfigurationBuilder interface {
-	Build(filename string) ([]byte, error)
+type Builder interface {
+	Build(ymlSchema YmlSchema) []byte
 }
 
 type ConfigurationBuilderYml struct {
@@ -50,26 +49,44 @@ func (configurationBuilder *ConfigurationBuilderYml) setRelationships(relationsh
 	return configurationBuilder
 }
 
+func (configurationBuilder *ConfigurationBuilderYml) setEntities(entities map[string]Entity) *ConfigurationBuilderYml {
+	configurationBuilder.configuration.entities = entities
+
+	return configurationBuilder
+}
+
 func (configurationBuilder *ConfigurationBuilderYml) get() *Configuration {
 	return configurationBuilder.configuration
 }
 
-func (configurationBuilder *ConfigurationBuilderYml) Build(filepath string) (*Configuration, error) {
-	ymlContent, err := os.ReadFile(CONFIGURATION_PATH + "/" + filepath)
+func (configurationBuilder *ConfigurationBuilderYml) Build(ymlSchema YmlSchema) *Configuration {
+	configuration := configurationBuilder.
+		setName(ymlSchema.Name).
+		setDescription(ymlSchema.Description)
 
-	if err != nil {
-		fmt.Println("Error reading file:", err)
-		return &Configuration{}, err
-	}
+	resources := configurationBuilder.buildResources(ymlSchema.Resources)
+	configuration.setResources(resources)
 
-	ymlSchema, err := NewYmlParser().Parse(string(ymlContent))
+	relationships := configurationBuilder.buildRelationships(resources)
+	configuration.setRelationships(relationships)
 
+	entities := configurationBuilder.buildEntities(ymlSchema.Entities)
+	configuration.setEntities(entities)
+
+	return configuration.get()
+}
+
+func (configurationBuilder *ConfigurationBuilderYml) buildResources(ymlResources map[string]YmlResource) map[string]Resource {
 	resources := make(map[string]Resource)
-	for resourceName, ymlResource := range ymlSchema.Resources {
+	for resourceName, ymlResource := range ymlResources {
 		resource := NewResource(ymlResource)
 		resources[resourceName] = *resource
 	}
 
+	return resources
+}
+
+func (configurationBuilder *ConfigurationBuilderYml) buildRelationships(resources map[string]Resource) Relationships {
 	fromRelationshipMap := make(map[string]FromRelationship)
 	for resourceName, resource := range resources {
 		relations := make(map[string]Relation)
@@ -108,13 +125,86 @@ func (configurationBuilder *ConfigurationBuilderYml) Build(filepath string) (*Co
 		toRelationshipMap[resourceName] = *NewToRelationship(fromRelations)
 	}
 
-	relationships := *NewRelationships(fromRelationshipMap, toRelationshipMap)
-	configuration := configurationBuilder.
-		setName(ymlSchema.Name).
-		setDescription(ymlSchema.Description).
-		setResources(resources).
-		setRelationships(relationships).
-		get()
+	return *NewRelationships(fromRelationshipMap, toRelationshipMap)
+}
 
-	return configuration, err
+func (configurationBuilder *ConfigurationBuilderYml) buildEntities(ymlEntitites map[string]YmlEntity) map[string]Entity {
+	entities := make(map[string]Entity)
+	for entityName, ymlEntity := range ymlEntitites {
+		entity := *NewEntity(ymlEntity.Description)
+		if entity.phases == nil {
+			entity.phases = make(map[string]Phase)
+		}
+		entity.phases = configurationBuilder.buildPhases(ymlEntity.Phases)
+		entities[entityName] = entity
+	}
+
+	return entities
+}
+
+func (configurationBuilder *ConfigurationBuilderYml) buildPhases(ymlPhases map[string]YmlPhase) map[string]Phase {
+	phases := make(map[string]Phase)
+	for phaseName, ymlPhase := range ymlPhases {
+		phase := *NewPhase(ymlPhase.Description)
+		if phase.tasks == nil {
+			phase.tasks = make(map[string]Task)
+		}
+
+		phase.tasks = configurationBuilder.buildTasks(ymlPhase.Tasks)
+		phases[phaseName] = phase
+	}
+
+	return phases
+}
+
+func (configurationBuilder *ConfigurationBuilderYml) buildTasks(ymlTasks map[string]YmlTask) map[string]Task {
+	tasks := make(map[string]Task)
+
+	for taskName, ymlTask := range ymlTasks {
+		task := *NewTask(configurationBuilder.configuration.resources[ymlTask.Resource])
+
+		if task.selectionCriteria == "Related" {
+			relatedSelectionCriteria := NewRelatedSelectionCriteria()
+			task.selectionCriteria = relatedSelectionCriteria
+		}
+
+		tasks[taskName] = task
+	}
+
+	for taskName, ymlTask := range ymlTasks {
+		ymlSelectionCriteria := ymlTask.SelectionCriteria
+		task := tasks[taskName]
+		switch ymlSelectionCriteria.Type {
+
+		case "Custom":
+			customSelectionCriteria := NewCustomSelectionCriteria()
+			customSelectionCriteria.criteria = ymlSelectionCriteria.Criteria
+			task.selectionCriteria = customSelectionCriteria
+
+		case "Index":
+			indexedSelectionCriteria := NewIndexedSelectionCriteria()
+			relatedTasks := []Task{}
+			for _, relatedTaskName := range ymlSelectionCriteria.Tasks {
+				relatedTasks = append(relatedTasks, tasks[relatedTaskName])
+			}
+
+			indexedSelectionCriteria.tasks = relatedTasks
+			task.selectionCriteria = indexedSelectionCriteria
+
+		case "Related":
+			relatedSelectionCriteria := NewRelatedSelectionCriteria()
+			relatedTasks := []Task{}
+			for _, relatedTaskName := range ymlSelectionCriteria.Tasks {
+				relatedTasks = append(relatedTasks, tasks[relatedTaskName])
+			}
+
+			relatedSelectionCriteria.tasks = relatedTasks
+			task.selectionCriteria = relatedSelectionCriteria
+
+		}
+
+		tasks[taskName] = task
+	}
+
+	return tasks
 }

@@ -1,21 +1,28 @@
 package configuration
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
+func getYmlSchema() YmlSchema {
+	ymlContent, _ := os.ReadFile(CONFIGURATION_PATH + "/entities_test.yml")
+	ymlSchema, _ := NewYmlParser().Parse(string(ymlContent))
+	return ymlSchema
+}
+
 func TestConfigurationBuilderCanBuildConfigurationFromFile(t *testing.T) {
 	configurationBuilder := NewConfigurationBuilderYml()
-	configuration, _ := configurationBuilder.Build("entities_test.yml")
+	configuration := configurationBuilder.Build(getYmlSchema())
 
 	assert.IsType(t, &Configuration{}, configuration)
 }
 
 func TestConfigurationBuilderCanBuildConfigurationWithResources(t *testing.T) {
 	configurationBuilder := NewConfigurationBuilderYml()
-	configuration, _ := configurationBuilder.Build("entities_test.yml")
+	configuration := configurationBuilder.Build(getYmlSchema())
 
 	assert.IsType(t, &Configuration{}, configuration)
 	resources := configuration.resources
@@ -29,7 +36,7 @@ func TestConfigurationBuilderCanBuildConfigurationWithResources(t *testing.T) {
 
 func TestConfigurationBuilderCanExtractRelationshipsFromGivenTable(t *testing.T) {
 	configurationBuilder := NewConfigurationBuilderYml()
-	configuration, _ := configurationBuilder.Build("entities_test.yml")
+	configuration := configurationBuilder.Build(getYmlSchema())
 
 	assert.IsType(t, Relationships{}, configuration.relationships)
 
@@ -46,8 +53,9 @@ func TestConfigurationBuilderCanExtractRelationshipsFromGivenTable(t *testing.T)
 }
 
 func TestConfigurationBuilderCanExtractRelationshipsToGivenTable(t *testing.T) {
+
 	configurationBuilder := NewConfigurationBuilderYml()
-	configuration, _ := configurationBuilder.Build("entities_test.yml")
+	configuration := configurationBuilder.Build(getYmlSchema())
 
 	assert.IsType(t, Relationships{}, configuration.relationships)
 
@@ -60,4 +68,21 @@ func TestConfigurationBuilderCanExtractRelationshipsToGivenTable(t *testing.T) {
 	assert.Equal(t, "my_test_table2", configuration.relationships.to["MyTestResource2"].from["MyTestResource"].toTable)
 	assert.Equal(t, "my_test_table2.id", configuration.relationships.to["MyTestResource2"].from["MyTestResource"].toKey)
 	assert.Equal(t, "NORMAL", configuration.relationships.to["MyTestResource2"].from["MyTestResource"].keyType)
+}
+
+func TestConfigurationBuilderCanBuildConfigurationWithEntities(t *testing.T) {
+	configurationBuilder := NewConfigurationBuilderYml()
+	configuration := configurationBuilder.Build(getYmlSchema())
+
+	assert.IsType(t, map[string]Entity{}, configuration.entities)
+	subjectEntity := configuration.entities["MyTestEntity"]
+	assert.Equal(t, "This is my test entity", subjectEntity.description)
+	assert.IsType(t, map[string]Phase{}, subjectEntity.phases)
+	subjectPhase := subjectEntity.phases["MyTestPhase1"]
+	assert.Equal(t, "This is a test phase", subjectPhase.description)
+	assert.IsType(t, map[string]Task{}, subjectPhase.tasks)
+	subjectTask := subjectPhase.tasks["TaskB"]
+
+	assert.IsType(t, Resource{}, subjectTask.resource)
+	assert.Equal(t, "my_test_table2", subjectTask.resource.tableName)
 }

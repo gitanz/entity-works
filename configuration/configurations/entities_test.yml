@@ -49,7 +49,8 @@ Entities:
             Resource: MyTestResource2
             SelectionCriteria:
               Type: Index
-              FromTask: TaskA
+              Tasks: 
+                - TaskA
               Index: IDX1
           TaskD:
             Resource: MyTestResource3

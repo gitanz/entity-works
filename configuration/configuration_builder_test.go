@@ -8,7 +8,7 @@ import (
 )
 
 func getYmlSchema() YmlSchema {
-	ymlContent, _ := os.ReadFile(CONFIGURATION_PATH + "/entities_test.yml")
+	ymlContent, _ := os.ReadFile(Path + "/entities_test.yml")
 	ymlSchema, _ := NewYmlParser().Parse(string(ymlContent))
 	return ymlSchema
 }

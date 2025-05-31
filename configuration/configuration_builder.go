@@ -4,62 +4,62 @@ import (
 	"os"
 )
 
-var CONFIGURATION_PATH string
+var Path string
 
 func init() {
 	dir, _ := os.Getwd()
-	CONFIGURATION_PATH = dir + "/configurations"
+	Path = dir + "/configurations"
 }
 
 type Builder interface {
 	Build(ymlSchema YmlSchema) []byte
 }
 
-type ConfigurationBuilderYml struct {
+type BuilderYml struct {
 	configuration *Configuration
 }
 
-func NewConfigurationBuilderYml() *ConfigurationBuilderYml {
-	return &ConfigurationBuilderYml{
+func NewConfigurationBuilderYml() *BuilderYml {
+	return &BuilderYml{
 		configuration: NewConfiguration(),
 	}
 }
 
-func (configurationBuilder *ConfigurationBuilderYml) setName(name string) *ConfigurationBuilderYml {
+func (configurationBuilder *BuilderYml) setName(name string) *BuilderYml {
 	configurationBuilder.configuration.name = name
 
 	return configurationBuilder
 }
 
-func (configurationBuilder *ConfigurationBuilderYml) setDescription(description string) *ConfigurationBuilderYml {
+func (configurationBuilder *BuilderYml) setDescription(description string) *BuilderYml {
 	configurationBuilder.configuration.description = description
 
 	return configurationBuilder
 }
 
-func (configurationBuilder *ConfigurationBuilderYml) setResources(resources map[string]Resource) *ConfigurationBuilderYml {
+func (configurationBuilder *BuilderYml) setResources(resources map[string]Resource) *BuilderYml {
 	configurationBuilder.configuration.resources = resources
 
 	return configurationBuilder
 }
 
-func (configurationBuilder *ConfigurationBuilderYml) setRelationships(relationships Relationships) *ConfigurationBuilderYml {
+func (configurationBuilder *BuilderYml) setRelationships(relationships Relationships) *BuilderYml {
 	configurationBuilder.configuration.relationships = relationships
 
 	return configurationBuilder
 }
 
-func (configurationBuilder *ConfigurationBuilderYml) setEntities(entities map[string]Entity) *ConfigurationBuilderYml {
+func (configurationBuilder *BuilderYml) setEntities(entities map[string]Entity) *BuilderYml {
 	configurationBuilder.configuration.entities = entities
 
 	return configurationBuilder
 }
 
-func (configurationBuilder *ConfigurationBuilderYml) get() *Configuration {
+func (configurationBuilder *BuilderYml) get() *Configuration {
 	return configurationBuilder.configuration
 }
 
-func (configurationBuilder *ConfigurationBuilderYml) Build(ymlSchema YmlSchema) *Configuration {
+func (configurationBuilder *BuilderYml) Build(ymlSchema YmlSchema) *Configuration {
 	configuration := configurationBuilder.
 		setName(ymlSchema.Name).
 		setDescription(ymlSchema.Description)
@@ -76,7 +76,7 @@ func (configurationBuilder *ConfigurationBuilderYml) Build(ymlSchema YmlSchema) 
 	return configuration.get()
 }
 
-func (configurationBuilder *ConfigurationBuilderYml) buildResources(ymlResources map[string]YmlResource) map[string]Resource {
+func (configurationBuilder *BuilderYml) buildResources(ymlResources map[string]YmlResource) map[string]Resource {
 	resources := make(map[string]Resource)
 	for resourceName, ymlResource := range ymlResources {
 		resource := NewResource(ymlResource)
@@ -86,7 +86,7 @@ func (configurationBuilder *ConfigurationBuilderYml) buildResources(ymlResources
 	return resources
 }
 
-func (configurationBuilder *ConfigurationBuilderYml) buildRelationships(resources map[string]Resource) Relationships {
+func (configurationBuilder *BuilderYml) buildRelationships(resources map[string]Resource) Relationships {
 	fromRelationshipMap := make(map[string]FromRelationship)
 	for resourceName, resource := range resources {
 		relations := make(map[string]Relation)
@@ -128,7 +128,7 @@ func (configurationBuilder *ConfigurationBuilderYml) buildRelationships(resource
 	return *NewRelationships(fromRelationshipMap, toRelationshipMap)
 }
 
-func (configurationBuilder *ConfigurationBuilderYml) buildEntities(ymlEntities map[string]YmlEntity) map[string]Entity {
+func (configurationBuilder *BuilderYml) buildEntities(ymlEntities map[string]YmlEntity) map[string]Entity {
 	entities := make(map[string]Entity)
 	for entityName, ymlEntity := range ymlEntities {
 		entity := *NewEntity(ymlEntity.Description)
@@ -142,7 +142,7 @@ func (configurationBuilder *ConfigurationBuilderYml) buildEntities(ymlEntities m
 	return entities
 }
 
-func (configurationBuilder *ConfigurationBuilderYml) buildComponents(ymlComponents map[string]YmlComponent) map[string]Component {
+func (configurationBuilder *BuilderYml) buildComponents(ymlComponents map[string]YmlComponent) map[string]Component {
 	components := make(map[string]Component)
 	for componentName, ymlComponent := range ymlComponents {
 		component := *NewComponent(ymlComponent.Description)
@@ -157,7 +157,7 @@ func (configurationBuilder *ConfigurationBuilderYml) buildComponents(ymlComponen
 	return components
 }
 
-func (configurationBuilder *ConfigurationBuilderYml) buildParts(ymlParts map[string]YmlPart) map[string]Part {
+func (configurationBuilder *BuilderYml) buildParts(ymlParts map[string]YmlPart) map[string]Part {
 	parts := make(map[string]Part)
 
 	for partName, ymlPart := range ymlParts {
@@ -183,7 +183,7 @@ func (configurationBuilder *ConfigurationBuilderYml) buildParts(ymlParts map[str
 
 		case "Index":
 			indexedSelectionCriteria := NewIndexedSelectionCriteria()
-			relatedParts := []Part{}
+			var relatedParts []Part
 			for _, relatedPartName := range ymlSelectionCriteria.Parts {
 				relatedParts = append(relatedParts, parts[relatedPartName])
 			}
@@ -193,7 +193,7 @@ func (configurationBuilder *ConfigurationBuilderYml) buildParts(ymlParts map[str
 
 		case "Related":
 			relatedSelectionCriteria := NewRelatedSelectionCriteria()
-			relatedParts := []Part{}
+			var relatedParts []Part
 			for _, relatedPartName := range ymlSelectionCriteria.Parts {
 				relatedParts = append(relatedParts, parts[relatedPartName])
 			}

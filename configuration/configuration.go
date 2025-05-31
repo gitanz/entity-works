@@ -120,51 +120,48 @@ func NewCustomSelectionCriteria() *CustomSelectionCriteria {
 	return &CustomSelectionCriteria{}
 }
 
-type RelatedSelectionCritiera struct {
-	tasks []Task
+type RelatedSelectionCriteria struct {
+	parts []Part
 }
 
-func NewRelatedSelectionCriteria() *RelatedSelectionCritiera {
-	return &RelatedSelectionCritiera{}
+func NewRelatedSelectionCriteria() *RelatedSelectionCriteria {
+	return &RelatedSelectionCriteria{}
 }
 
 type IndexedSelectionCriteria struct {
-	tasks []Task
+	parts []Part
 }
 
 func NewIndexedSelectionCriteria() *IndexedSelectionCriteria {
 	return &IndexedSelectionCriteria{}
 }
 
-type NewIndexedSelectionCritier struct {
-}
-
-type Task struct {
+type Part struct {
 	resource          Resource
 	selectionCriteria SelectionCriteria
 }
 
-func NewTask(resource Resource) *Task {
-	return &Task{
+func NewPart(resource Resource) *Part {
+	return &Part{
 		resource: resource,
 	}
 }
 
-type Phase struct {
+type Component struct {
 	description string
-	tasks       map[string]Task
+	parts       map[string]Part
 }
 
-func NewPhase(description string) *Phase {
-	phase := &Phase{}
-	phase.description = description
+func NewComponent(description string) *Component {
+	component := &Component{}
+	component.description = description
 
-	return phase
+	return component
 }
 
 type Entity struct {
 	description string
-	phases      map[string]Phase
+	components  map[string]Component
 }
 
 func NewEntity(description string) *Entity {

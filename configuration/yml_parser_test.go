@@ -104,138 +104,138 @@ func TestConfigurationBuilderrParsesYmlWithEntitiesAndPhases(t *testing.T) {
     Entities:
       MyTestEntity:
         Description: This is my test entity
-        Phases:
-          MyTestPhase1:
-            Description: This is a test phase
-          MyTestPhase2:
-            Description: This is a test phase 2
+        Components:
+          MyTestComponent1:
+            Description: This is component 1
+          MyTestComponent2:
+            Description: This is component 2
   `)
 
 	assert.Nil(t, err)
-	assert.IsType(t, YmlPhase{}, ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"])
-	assert.Equal(t, "This is a test phase", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Description)
-	assert.Equal(t, "This is a test phase 2", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase2"].Description)
+	assert.IsType(t, YmlComponent{}, ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"])
+	assert.Equal(t, "This is component 1", ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Description)
+	assert.Equal(t, "This is component 2", ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent2"].Description)
 }
 
 func TestConfigurationBuilderParsesYmlWithEntitiesAndPhasesAndTasks(t *testing.T) {
 	ymlParser := NewYmlParser()
 	ymlSchema, err := ymlParser.Parse(
 		`
-    Name: Example
-    Description: Example YML configuration
-    Entities:
-      MyTestEntity:
-        Description: This is my test entity
-        Phases:
-          MyTestPhase1:
-            Description: This is a test phase
-            Tasks:
-              TaskA:
-                Resource: MyTestResource
-                Shares: true
-              TaskB:
-                Resource: MyTestResource2
-                SelectionCriteria:
-                  Type: Custom
-                  Criteria: |
-                    1 = 1
-              TaskC:
-                Resource: MyTestResource2
-                SelectionCriteria:
-                  Type: Index
-                  Tasks: 
-                    - TaskA
-                  Index: IDX1
-              TaskD:
-                Resource: MyTestResource3
-                SelectionCriteria:
-                  Type: Related
-                  Tasks: 
-                    - TaskB
-  `)
+   Name: Example
+   Description: Example YML configuration
+   Entities:
+     MyTestEntity:
+       Description: This is my test entity
+       Components:
+         MyTestComponent1:
+           Description: This is a test phase
+           Parts:
+             PartA:
+               Resource: MyTestResource
+               Shares: true
+             PartB:
+               Resource: MyTestResource2
+               SelectionCriteria:
+                 Type: Custom
+                 Criteria: |
+                   1 = 1
+             PartC:
+               Resource: MyTestResource2
+               SelectionCriteria:
+                 Type: Index
+                 Parts:
+                   - PartA
+                 Index: IDX1
+             PartD:
+               Resource: MyTestResource3
+               SelectionCriteria:
+                 Type: Related
+                 Parts:
+                   - PartB
+ `)
 
 	assert.Nil(t, err)
-	assert.IsType(t, YmlTask{}, ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskA"])
-	assert.Equal(t, "MyTestResource", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskA"].Resource)
-	assert.True(t, ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskA"].Shares)
+	assert.IsType(t, YmlPart{}, ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartA"])
+	assert.Equal(t, "MyTestResource", ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartA"].Resource)
+	assert.True(t, ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartA"].Shares)
 
-	assert.IsType(t, YmlSelectionCriteria{}, ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskB"].SelectionCriteria)
-	assert.Equal(t, "Custom", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskB"].SelectionCriteria.Type)
-	assert.Equal(t, "1 = 1\n", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskB"].SelectionCriteria.Criteria)
+	assert.IsType(t, YmlSelectionCriteria{}, ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartB"].SelectionCriteria)
+	assert.Equal(t, "Custom", ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartB"].SelectionCriteria.Type)
+	assert.Equal(t, "1 = 1\n", ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartB"].SelectionCriteria.Criteria)
 
-	assert.Equal(t, "Index", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskC"].SelectionCriteria.Type)
-	assert.ElementsMatch(t, []string{"TaskA"}, ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskC"].SelectionCriteria.Tasks)
-	assert.Equal(t, "IDX1", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskC"].SelectionCriteria.Index)
+	assert.Equal(t, "Index", ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartC"].SelectionCriteria.Type)
+	assert.ElementsMatch(t, []string{"PartA"}, ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartC"].SelectionCriteria.Parts)
+	assert.Equal(t, "IDX1", ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartC"].SelectionCriteria.Index)
 
-	assert.Equal(t, "Related", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskD"].SelectionCriteria.Type)
-	assert.ElementsMatch(t, []string{"TaskB"}, ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskD"].SelectionCriteria.Tasks)
+	assert.Equal(t, "Related", ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartD"].SelectionCriteria.Type)
+	assert.ElementsMatch(t, []string{"PartB"}, ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartD"].SelectionCriteria.Parts)
 }
 
 func TestConfigurationBuilderParsesYmlWithResourcesEntitiesPhasesAndTasks(t *testing.T) {
 	ymlParser := NewYmlParser()
 	ymlSchema, err := ymlParser.Parse(
 		`
-    Name: Example
-    Description: Example YML configuration
-    Resources:
-      MyTestResource:
-        TableName: my_test_table
-        PrimaryKey:
-          - my_test_table.id
-        AutoIncrement: true
-        Index:
-          IDX1:
-            - my_test_table.idx1
-          IDX2:
-            - my_test_table.idx1
-            - my_test_table.idx2
-        ForeignKeys:
-          - Type: NORMAL
-            Key: my_test_table.fk1
-            ResourceName: MyTestResource2
-            ForeignKey: my_test_table2.id
+   Name: Example
+   Description: Example YML configuration
+   Resources:
+     MyTestResource:
+       TableName: my_test_table
+       PrimaryKey:
+         - my_test_table.id
+       AutoIncrement: true
+       Index:
+         IDX1:
+           - my_test_table.idx1
+         IDX2:
+           - my_test_table.idx1
+           - my_test_table.idx2
+       ForeignKeys:
+         - Type: NORMAL
+           Key: my_test_table.fk1
+           ResourceName: MyTestResource2
+           ForeignKey: my_test_table2.id
 
-      MyTestResource2:
-        TableName: my_test_table2
-        PrimaryKey:
-          - my_test_table2.id
-        AutoIncrement: true
-        Index:
-          IDX1:
-            - my_test_table2.idx1
-          IDX2:
-            - my_test_table2.idx1
-            - my_test_table2.idx2      
-    Entities:
-      MyTestEntity:
-        Description: This is my test entity
-        Phases:
-          MyTestPhase1:
-            Description: This is a test phase
-            Tasks:
-              TaskA:
-                Resource: MyTestResource
-                Shares: true
-              TaskB:
-                Resource: MyTestResource2
-                SelectionCriteria:
-                  Type: Custom
-                  Criteria: |
-                    1 = 1
-              TaskC:
-                Resource: MyTestResource2
-                SelectionCriteria:
-                  Type: Index
-                  Tasks: 
-                    - TaskA
-                  Index: IDX1
-              TaskD:
-                Resource: MyTestResource3
-                SelectionCriteria:
-                  Type: Related
-                  Tasks: 
-                    - TaskB
-  `)
+     MyTestResource2:
+       TableName: my_test_table2
+       PrimaryKey:
+         - my_test_table2.id
+       AutoIncrement: true
+       Index:
+         IDX1:
+           - my_test_table2.idx1
+         IDX2:
+           - my_test_table2.idx1
+           - my_test_table2.idx2
+   Entities:
+     MyTestEntity:
+       Description: This is my test entity
+       Components:
+         MyTestComponent1:
+           Description: This is a test phase
+           Parts:
+             PartA:
+               Resource: MyTestResource
+               Shares: true
+             PartB:
+               Resource: MyTestResource2
+               SelectionCriteria:
+                 Type: Custom
+                 Criteria: |
+                   1 = 1
+             PartC:
+               Resource: MyTestResource2
+               SelectionCriteria:
+                 Type: Index
+                 Parts:
+                   - PartA
+                 Index: IDX1
+             PartD:
+               Resource: MyTestResource3
+               SelectionCriteria:
+                 Type: Related
+                 Parts:
+                   - PartB
+ `)
 
 	assert.Nil(t, err)
 	assert.Equal(t, "Example", ymlSchema.Name)
@@ -251,18 +251,18 @@ func TestConfigurationBuilderParsesYmlWithResourcesEntitiesPhasesAndTasks(t *tes
 	assert.True(t, ymlSchema.Resources["MyTestResource2"].AutoIncrement)
 	assert.ElementsMatch(t, []string{"my_test_table2.idx1"}, ymlSchema.Resources["MyTestResource2"].Index["IDX1"])
 
-	assert.IsType(t, YmlTask{}, ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskA"])
-	assert.Equal(t, "MyTestResource", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskA"].Resource)
-	assert.True(t, ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskA"].Shares)
+	assert.IsType(t, YmlPart{}, ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartA"])
+	assert.Equal(t, "MyTestResource", ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartA"].Resource)
+	assert.True(t, ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartA"].Shares)
 
-	assert.IsType(t, YmlSelectionCriteria{}, ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskB"].SelectionCriteria)
-	assert.Equal(t, "Custom", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskB"].SelectionCriteria.Type)
-	assert.Equal(t, "1 = 1\n", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskB"].SelectionCriteria.Criteria)
+	assert.IsType(t, YmlSelectionCriteria{}, ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartB"].SelectionCriteria)
+	assert.Equal(t, "Custom", ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartB"].SelectionCriteria.Type)
+	assert.Equal(t, "1 = 1\n", ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartB"].SelectionCriteria.Criteria)
 
-	assert.Equal(t, "Index", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskC"].SelectionCriteria.Type)
-	assert.ElementsMatch(t, []string{"TaskA"}, ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskC"].SelectionCriteria.Tasks)
-	assert.Equal(t, "IDX1", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskC"].SelectionCriteria.Index)
+	assert.Equal(t, "Index", ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartC"].SelectionCriteria.Type)
+	assert.ElementsMatch(t, []string{"PartA"}, ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartC"].SelectionCriteria.Parts)
+	assert.Equal(t, "IDX1", ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartC"].SelectionCriteria.Index)
 
-	assert.Equal(t, "Related", ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskD"].SelectionCriteria.Type)
-	assert.ElementsMatch(t, []string{"TaskB"}, ymlSchema.Entities["MyTestEntity"].Phases["MyTestPhase1"].Tasks["TaskD"].SelectionCriteria.Tasks)
+	assert.Equal(t, "Related", ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartD"].SelectionCriteria.Type)
+	assert.ElementsMatch(t, []string{"PartB"}, ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Parts["PartD"].SelectionCriteria.Parts)
 }

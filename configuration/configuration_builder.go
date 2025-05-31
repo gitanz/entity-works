@@ -128,83 +128,83 @@ func (configurationBuilder *ConfigurationBuilderYml) buildRelationships(resource
 	return *NewRelationships(fromRelationshipMap, toRelationshipMap)
 }
 
-func (configurationBuilder *ConfigurationBuilderYml) buildEntities(ymlEntitites map[string]YmlEntity) map[string]Entity {
+func (configurationBuilder *ConfigurationBuilderYml) buildEntities(ymlEntities map[string]YmlEntity) map[string]Entity {
 	entities := make(map[string]Entity)
-	for entityName, ymlEntity := range ymlEntitites {
+	for entityName, ymlEntity := range ymlEntities {
 		entity := *NewEntity(ymlEntity.Description)
-		if entity.phases == nil {
-			entity.phases = make(map[string]Phase)
+		if entity.components == nil {
+			entity.components = make(map[string]Component)
 		}
-		entity.phases = configurationBuilder.buildPhases(ymlEntity.Phases)
+		entity.components = configurationBuilder.buildComponents(ymlEntity.Components)
 		entities[entityName] = entity
 	}
 
 	return entities
 }
 
-func (configurationBuilder *ConfigurationBuilderYml) buildPhases(ymlPhases map[string]YmlPhase) map[string]Phase {
-	phases := make(map[string]Phase)
-	for phaseName, ymlPhase := range ymlPhases {
-		phase := *NewPhase(ymlPhase.Description)
-		if phase.tasks == nil {
-			phase.tasks = make(map[string]Task)
+func (configurationBuilder *ConfigurationBuilderYml) buildComponents(ymlComponents map[string]YmlComponent) map[string]Component {
+	components := make(map[string]Component)
+	for componentName, ymlComponent := range ymlComponents {
+		component := *NewComponent(ymlComponent.Description)
+		if component.parts == nil {
+			component.parts = make(map[string]Part)
 		}
 
-		phase.tasks = configurationBuilder.buildTasks(ymlPhase.Tasks)
-		phases[phaseName] = phase
+		component.parts = configurationBuilder.buildParts(ymlComponent.Parts)
+		components[componentName] = component
 	}
 
-	return phases
+	return components
 }
 
-func (configurationBuilder *ConfigurationBuilderYml) buildTasks(ymlTasks map[string]YmlTask) map[string]Task {
-	tasks := make(map[string]Task)
+func (configurationBuilder *ConfigurationBuilderYml) buildParts(ymlParts map[string]YmlPart) map[string]Part {
+	parts := make(map[string]Part)
 
-	for taskName, ymlTask := range ymlTasks {
-		task := *NewTask(configurationBuilder.configuration.resources[ymlTask.Resource])
+	for partName, ymlPart := range ymlParts {
+		part := *NewPart(configurationBuilder.configuration.resources[ymlPart.Resource])
 
-		if task.selectionCriteria == "Related" {
+		if part.selectionCriteria == "Related" {
 			relatedSelectionCriteria := NewRelatedSelectionCriteria()
-			task.selectionCriteria = relatedSelectionCriteria
+			part.selectionCriteria = relatedSelectionCriteria
 		}
 
-		tasks[taskName] = task
+		parts[partName] = part
 	}
 
-	for taskName, ymlTask := range ymlTasks {
-		ymlSelectionCriteria := ymlTask.SelectionCriteria
-		task := tasks[taskName]
+	for partName, ymlPart := range ymlParts {
+		ymlSelectionCriteria := ymlPart.SelectionCriteria
+		part := parts[partName]
 		switch ymlSelectionCriteria.Type {
 
 		case "Custom":
 			customSelectionCriteria := NewCustomSelectionCriteria()
 			customSelectionCriteria.criteria = ymlSelectionCriteria.Criteria
-			task.selectionCriteria = customSelectionCriteria
+			part.selectionCriteria = customSelectionCriteria
 
 		case "Index":
 			indexedSelectionCriteria := NewIndexedSelectionCriteria()
-			relatedTasks := []Task{}
-			for _, relatedTaskName := range ymlSelectionCriteria.Tasks {
-				relatedTasks = append(relatedTasks, tasks[relatedTaskName])
+			relatedParts := []Part{}
+			for _, relatedPartName := range ymlSelectionCriteria.Parts {
+				relatedParts = append(relatedParts, parts[relatedPartName])
 			}
 
-			indexedSelectionCriteria.tasks = relatedTasks
-			task.selectionCriteria = indexedSelectionCriteria
+			indexedSelectionCriteria.parts = relatedParts
+			part.selectionCriteria = indexedSelectionCriteria
 
 		case "Related":
 			relatedSelectionCriteria := NewRelatedSelectionCriteria()
-			relatedTasks := []Task{}
-			for _, relatedTaskName := range ymlSelectionCriteria.Tasks {
-				relatedTasks = append(relatedTasks, tasks[relatedTaskName])
+			relatedParts := []Part{}
+			for _, relatedPartName := range ymlSelectionCriteria.Parts {
+				relatedParts = append(relatedParts, parts[relatedPartName])
 			}
 
-			relatedSelectionCriteria.tasks = relatedTasks
-			task.selectionCriteria = relatedSelectionCriteria
+			relatedSelectionCriteria.parts = relatedParts
+			part.selectionCriteria = relatedSelectionCriteria
 
 		}
 
-		tasks[taskName] = task
+		parts[partName] = part
 	}
 
-	return tasks
+	return parts
 }

@@ -32,30 +32,30 @@ Resources:
 Entities:
   MyTestEntity:
     Description: This is my test entity
-    Phases:
-      MyTestPhase1:
+    Components:
+      MyTestComponent1:
         Description: This is a test phase
-        Tasks:
-          TaskA:
+        Parts:
+          PartA:
             Resource: MyTestResource
             Shares: true
-          TaskB:
+          PartB:
             Resource: MyTestResource2
             SelectionCriteria:
               Type: Custom
               Criteria: |
                 1 = 1
-          TaskC:
+          PartC:
             Resource: MyTestResource2
             SelectionCriteria:
               Type: Index
-              Tasks: 
-                - TaskA
+              Parts:
+                - PartA
               Index: IDX1
-          TaskD:
+          PartD:
             Resource: MyTestResource3
             SelectionCriteria:
               Type: Related
-              Tasks: 
-                - TaskB
+              Parts:
+                - PartB
                 

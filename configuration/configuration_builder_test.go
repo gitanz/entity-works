@@ -77,12 +77,57 @@ func TestConfigurationBuilderCanBuildConfigurationWithEntities(t *testing.T) {
 	assert.IsType(t, map[string]Entity{}, configuration.entities)
 	subjectEntity := configuration.entities["MyTestEntity"]
 	assert.Equal(t, "This is my test entity", subjectEntity.description)
-	assert.IsType(t, map[string]Phase{}, subjectEntity.phases)
-	subjectPhase := subjectEntity.phases["MyTestPhase1"]
-	assert.Equal(t, "This is a test phase", subjectPhase.description)
-	assert.IsType(t, map[string]Task{}, subjectPhase.tasks)
-	subjectTask := subjectPhase.tasks["TaskB"]
+	assert.IsType(t, map[string]Component{}, subjectEntity.components)
+	subjectComponent := subjectEntity.components["MyTestComponent1"]
+	assert.Equal(t, "This is a test phase", subjectComponent.description)
+	assert.IsType(t, map[string]Part{}, subjectComponent.parts)
+	subjectPart := subjectComponent.parts["PartA"]
 
-	assert.IsType(t, Resource{}, subjectTask.resource)
-	assert.Equal(t, "my_test_table2", subjectTask.resource.tableName)
+	assert.IsType(t, Resource{}, subjectPart.resource)
+	assert.Equal(t, "my_test_table", subjectPart.resource.tableName)
+}
+
+func TestEntityFromConfigurationBuiltUsingBuilderContainsPhasesAndTasks(t *testing.T) {
+	configurationBuilder := NewConfigurationBuilderYml()
+	configuration := configurationBuilder.Build(getYmlSchema())
+
+	assert.IsType(t, map[string]Entity{}, configuration.entities)
+	subjectEntity := configuration.entities["MyTestEntity"]
+	assert.Equal(t, "This is my test entity", subjectEntity.description)
+	assert.IsType(t, map[string]Component{}, subjectEntity.components)
+	subjectPhase := subjectEntity.components["MyTestComponent1"]
+	assert.Equal(t, "This is a test phase", subjectPhase.description)
+	assert.IsType(t, map[string]Part{}, subjectPhase.parts)
+	subjectPart := subjectPhase.parts["PartA"]
+
+	assert.IsType(t, Resource{}, subjectPart.resource)
+	assert.Equal(t, "my_test_table", subjectPart.resource.tableName)
+}
+
+func TestTasksInConfigurationBuiltUsingBuilderContainsResourceAndSelectionCriteria(t *testing.T) {
+	configurationBuilder := NewConfigurationBuilderYml()
+	configuration := configurationBuilder.Build(getYmlSchema())
+
+	assert.IsType(t, map[string]Entity{}, configuration.entities)
+	subjectEntity := configuration.entities["MyTestEntity"]
+	subjectPhase := subjectEntity.components["MyTestComponent1"]
+	partA := subjectPhase.parts["PartA"]
+
+	assert.IsType(t, Resource{}, partA.resource)
+	assert.Nil(t, partA.selectionCriteria)
+
+	partB := subjectPhase.parts["PartB"]
+	assert.IsType(t, Resource{}, partB.resource)
+	assert.NotNil(t, partB.selectionCriteria)
+	assert.IsType(t, &CustomSelectionCriteria{}, partB.selectionCriteria)
+
+	partC := subjectPhase.parts["PartC"]
+	assert.IsType(t, Resource{}, partC.resource)
+	assert.NotNil(t, partC.selectionCriteria)
+	assert.IsType(t, &IndexedSelectionCriteria{}, partC.selectionCriteria)
+
+	partD := subjectPhase.parts["PartD"]
+	assert.IsType(t, Resource{}, partD.resource)
+	assert.NotNil(t, partD.selectionCriteria)
+	assert.IsType(t, &RelatedSelectionCriteria{}, partD.selectionCriteria)
 }

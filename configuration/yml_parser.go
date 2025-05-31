@@ -22,24 +22,24 @@ type YmlResource struct {
 type YmlSelectionCriteria struct {
 	Type     string   `yaml:"Type"`
 	Criteria string   `yaml:"Criteria,omitempty"`
-	Tasks    []string `yaml:"Tasks,omitempty"`
+	Parts    []string `yaml:"Parts,omitempty"`
 	Index    string   `yaml:"Index,omitempty"`
 }
 
-type YmlTask struct {
+type YmlPart struct {
 	Resource          string               `yaml:"Resource"`
 	Shares            bool                 `yaml:"Shares,omitempty"`
 	SelectionCriteria YmlSelectionCriteria `yaml:"SelectionCriteria"`
 }
 
-type YmlPhase struct {
+type YmlComponent struct {
 	Description string             `yaml:"Description"`
-	Tasks       map[string]YmlTask `yaml:"Tasks"`
+	Parts       map[string]YmlPart `yaml:"Parts,omitempty"`
 }
 
 type YmlEntity struct {
-	Description string              `yaml:"Description"`
-	Phases      map[string]YmlPhase `yaml:"Phases,omitempty"`
+	Description string                  `yaml:"Description"`
+	Components  map[string]YmlComponent `yaml:"Components,omitempty"`
 }
 
 type YmlSchema struct {

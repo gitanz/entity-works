@@ -128,7 +128,7 @@ func TestConfigurationBuilderParsesYmlWithEntitiesAndPhasesAndTasks(t *testing.T
        Description: This is my test entity
        Components:
          MyTestComponent1:
-           Description: This is a test phase
+           Description: This is a test component
            Parts:
              PartA:
                Resource: MyTestResource
@@ -211,7 +211,7 @@ func TestConfigurationBuilderParsesYmlWithResourcesEntitiesPhasesAndTasks(t *tes
        Description: This is my test entity
        Components:
          MyTestComponent1:
-           Description: This is a test phase
+           Description: This is a test component
            Parts:
              PartA:
                Resource: MyTestResource

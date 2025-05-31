@@ -79,7 +79,7 @@ func TestConfigurationBuilderCanBuildConfigurationWithEntities(t *testing.T) {
 	assert.Equal(t, "This is my test entity", subjectEntity.description)
 	assert.IsType(t, map[string]Component{}, subjectEntity.components)
 	subjectComponent := subjectEntity.components["MyTestComponent1"]
-	assert.Equal(t, "This is a test phase", subjectComponent.description)
+	assert.Equal(t, "This is a test component", subjectComponent.description)
 	assert.IsType(t, map[string]Part{}, subjectComponent.parts)
 	subjectPart := subjectComponent.parts["PartA"]
 
@@ -96,7 +96,7 @@ func TestEntityFromConfigurationBuiltUsingBuilderContainsPhasesAndTasks(t *testi
 	assert.Equal(t, "This is my test entity", subjectEntity.description)
 	assert.IsType(t, map[string]Component{}, subjectEntity.components)
 	subjectPhase := subjectEntity.components["MyTestComponent1"]
-	assert.Equal(t, "This is a test phase", subjectPhase.description)
+	assert.Equal(t, "This is a test component", subjectPhase.description)
 	assert.IsType(t, map[string]Part{}, subjectPhase.parts)
 	subjectPart := subjectPhase.parts["PartA"]
 

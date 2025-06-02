@@ -1,0 +1,268 @@
+Name: TheImperfectOnlineShop
+Description: Example Imperfect Online Shop
+Resources:
+  Region:
+    TableName: regions
+    PrimaryKey:
+      - regions.region
+    AutoIncrement: false
+    Index:
+      Region:
+        - regions.region
+
+  Customers:
+    TableName: customers
+    PrimaryKey:
+      - customers.id
+    AutoIncrement: true
+    Index:
+      Region:
+        - customers.region
+
+  CustomerPreferences:
+    TableName: customer_preferences
+    PrimaryKey:
+      - customer_preferences.id
+    AutoIncrement: true
+    ForeignKeys:
+      - Type: NORMAL
+        Key: customer_preferences.customer_id
+        ResourceName: Customers
+        ForeignKey: customers.id
+
+      - Type: DELIMITED
+        Key: customer_preferences.fav_category_ids
+        ResourceName: Categories
+        ForeignKey: categories.id
+
+      - Type: DELIMITED
+        Key: customer_preferences.fav_product_ids
+        ResourceName: Products
+        ForeignKey: products.id
+
+  Categories:
+    TableName: categories
+    PrimaryKey:
+      - categories.id
+    AutoIncrement: true
+    ForeignKeys:
+      - Type: NORMAL
+        Key: categories.parent_id
+        ResourceName: Categories
+        ForeignKey: categories.id
+    Index:
+      Region:
+        - categories.region
+
+  Products:
+    TableName: products
+    PrimaryKey:
+      - products.id
+    AutoIncrement: true
+    ForeignKeys:
+      - Type: NORMAL
+        Key: products.category_id
+        ResourceName: Categories
+        ForeignKey: categories.id
+
+  Carts:
+    TableName: carts
+    PrimaryKey:
+      - carts.id
+    AutoIncrement: true
+    ForeignKeys:
+      - Type: NORMAL
+        Key: carts.customer_id
+        ResourceName: Customers
+        ForeignKey: customers.id
+
+  CartItems:
+    TableName: cart_items
+    PrimaryKey:
+      - cart_items.id
+    AutoIncrement: true
+    ForeignKeys:
+      - Type: NORMAL
+        Key: cart_items.cart_id
+        ResourceName: Carts
+        ForeignKey: carts.id
+
+      - Type: NORMAL
+        Key: cart_items.product_id
+        ResourceName: Products
+        ForeignKey: products.id
+
+  Orders:
+    TableName: orders
+    PrimaryKeys:
+      - orders.id
+    AutoIncrement: true
+    ForeignKeys:
+      - Type: NORMAL
+        Key: orders.customer_id
+        ResourceName: Customers
+        ForeignKey: customers.id
+
+  OrderItems:
+    TableName: order_items
+    PrimaryKeys:
+      - order_items.id
+    AutoIncrement: true
+    ForeignKeys:
+      - Type: NORMAL
+        Key: order_items.order_id
+        ResourceName: Orders
+        ForeignKey: orders.id
+
+      - Type: NORMAL
+        Key: order_items.product_id
+        ResourceName: Products
+        ForeignKey: products.id
+
+
+  Payments:
+    TableName: payments
+    PrimaryKeys:
+      - payments.id
+    AutoIncrement: true
+    ForeignKeys:
+      - Type: NORMAL
+        Key: payments.order_id
+        ResourceName: Orders
+        ForeignKey: orders.id
+
+  Reviews:
+    TableName: reviews
+    PrimaryKeys:
+      - reviews.id
+    AutoIncrement: true
+    ForeignKeys:
+      - Type: NORMAL
+        Key: reviews.customer_id
+        ResourceName: Customers
+        ForeignKey: customers.id
+
+      - Type: NORMAL
+        Key: reviews.product_id
+        ResourceName: Reviews
+        ForeignKey: products.id
+
+Entities:
+  CoreProduct:
+    Description: This is my core product entity
+    Components:
+      Customers:
+        Description: Customers component
+        Parts:
+          Regions:
+            Resource: Regions
+            SelectionCriteria:
+              Type: Region
+              Criteria: |
+                region = "{{region}}"
+
+          Customers:
+            Resource: Customers
+            SelectionCriteria:
+              Type: Index
+              Parts:
+                - Regions
+              Index: Region
+
+          CustomerPreferences:
+            Resource: CustomerPreferences
+            SelectionCriteria:
+              Type: Related
+              Parts:
+                - Customers
+
+      Categories:
+        Description: Categories component
+        Parts:
+          Regions:
+            Resource: Regions
+            SelectionCriteria:
+              Type: Region
+              Criteria: |
+                region = "{{region}}"
+
+          Categories:
+            Resource: Categories
+            SelectionCriteria:
+              Type: Index
+              Parts:
+                - Regions
+              Index: Region
+
+      Products:
+        Categories:
+          Shares: CoreProduct::Categories::Categories
+
+        Products:
+          Resource: Products
+          SelectionCriteria:
+            Type: Related
+            Parts:
+              - Categories
+
+      Orders:
+        Customers:
+          Shares: CoreProduct::Customers::Customers
+
+        Orders:
+          Resource: Orders
+          SelectionCriteria:
+            Type: Related
+            Parts:
+              - Customers
+
+        OrderItems:
+          Resource: OrderItems
+          SelectionCriteria:
+            Type: Related
+            Parts:
+              - Orders
+
+      Carts:
+        Customers:
+          Shares: CoreProduct::Customers::Customers
+
+        Carts:
+          Resource: Carts
+          SelectionCriteria:
+            Type: Related
+            Parts:
+              - Customers
+
+        CartItems:
+          Resource: CartItems
+          SelectionCriteria:
+            Type: Related
+            Parts:
+              - Carts
+
+      Payments:
+        Orders:
+          Shares: CoreProduct::Orders::Orders
+
+        Payments:
+          Resource: Payments
+          SelectionCriteria:
+            Type: Related
+            Parts:
+              - Orders
+
+      Reviews:
+        Customers:
+          Shares: CoreProduct::Customers::Customers
+
+        Products:
+          Shares: CoreProduct::Products::Products
+
+        Reviews:
+          Resource: Reviews
+          SelectionCriteria:
+            Type: Related
+            Parts:
+              - Customers
+              - Products

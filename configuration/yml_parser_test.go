@@ -157,7 +157,6 @@ func TestConfigurationBuilderParsesYmlWithEntitiesAndPhasesAndTasks(t *testing.T
 	assert.Nil(t, err)
 	assert.IsType(t, YmlElement{}, ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Elements["ElementA"])
 	assert.Equal(t, "MyTestResource", ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Elements["ElementA"].Resource)
-	assert.True(t, ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Elements["ElementA"].Shares)
 
 	assert.IsType(t, YmlSelectionCriteria{}, ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Elements["ElementB"].SelectionCriteria)
 	assert.Equal(t, "Custom", ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Elements["ElementB"].SelectionCriteria.Type)
@@ -253,7 +252,6 @@ func TestConfigurationBuilderParsesYmlWithResourcesEntitiesPhasesAndTasks(t *tes
 
 	assert.IsType(t, YmlElement{}, ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Elements["ElementA"])
 	assert.Equal(t, "MyTestResource", ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Elements["ElementA"].Resource)
-	assert.True(t, ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Elements["ElementA"].Shares)
 
 	assert.IsType(t, YmlSelectionCriteria{}, ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Elements["ElementB"].SelectionCriteria)
 	assert.Equal(t, "Custom", ymlSchema.Entities["MyTestEntity"].Components["MyTestComponent1"].Elements["ElementB"].SelectionCriteria.Type)

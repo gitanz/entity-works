@@ -28,7 +28,7 @@ type YmlSelectionCriteria struct {
 
 type YmlElement struct {
 	Resource          string               `yaml:"Resource"`
-	Shares            bool                 `yaml:"Shares,omitempty"`
+	Shares            string               `yaml:"Shares,omitempty"`
 	SelectionCriteria YmlSelectionCriteria `yaml:"SelectionCriteria"`
 }
 

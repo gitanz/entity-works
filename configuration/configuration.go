@@ -121,7 +121,7 @@ func NewCustomSelectionCriteria() *CustomSelectionCriteria {
 }
 
 type RelatedSelectionCriteria struct {
-	parts []Part
+	elements []Element
 }
 
 func NewRelatedSelectionCriteria() *RelatedSelectionCriteria {
@@ -129,27 +129,27 @@ func NewRelatedSelectionCriteria() *RelatedSelectionCriteria {
 }
 
 type IndexedSelectionCriteria struct {
-	parts []Part
+	elements []Element
 }
 
 func NewIndexedSelectionCriteria() *IndexedSelectionCriteria {
 	return &IndexedSelectionCriteria{}
 }
 
-type Part struct {
+type Element struct {
 	resource          Resource
 	selectionCriteria SelectionCriteria
 }
 
-func NewPart(resource Resource) *Part {
-	return &Part{
+func NewElement(resource Resource) *Element {
+	return &Element{
 		resource: resource,
 	}
 }
 
 type Component struct {
 	description string
-	parts       map[string]Part
+	elements    map[string]Element
 }
 
 func NewComponent(description string) *Component {

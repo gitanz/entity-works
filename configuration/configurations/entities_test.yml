@@ -35,27 +35,27 @@ Entities:
     Components:
       MyTestComponent1:
         Description: This is a test component
-        Parts:
-          PartA:
+        Elements:
+          ElementA:
             Resource: MyTestResource
             Shares: true
-          PartB:
+          ElementB:
             Resource: MyTestResource2
             SelectionCriteria:
               Type: Custom
               Criteria: |
                 1 = 1
-          PartC:
+          ElementC:
             Resource: MyTestResource2
             SelectionCriteria:
               Type: Index
-              Parts:
-                - PartA
+              Elements:
+                - ElementA
               Index: IDX1
-          PartD:
+          ElementD:
             Resource: MyTestResource3
             SelectionCriteria:
               Type: Related
-              Parts:
-                - PartB
+              Elements:
+                - ElementB
                 

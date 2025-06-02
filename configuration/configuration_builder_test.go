@@ -80,11 +80,10 @@ func TestConfigurationBuilderCanBuildConfigurationWithEntities(t *testing.T) {
 	assert.IsType(t, map[string]Component{}, subjectEntity.components)
 	subjectComponent := subjectEntity.components["MyTestComponent1"]
 	assert.Equal(t, "This is a test component", subjectComponent.description)
-	assert.IsType(t, map[string]Part{}, subjectComponent.parts)
-	subjectPart := subjectComponent.parts["PartA"]
-
-	assert.IsType(t, Resource{}, subjectPart.resource)
-	assert.Equal(t, "my_test_table", subjectPart.resource.tableName)
+	assert.IsType(t, map[string]Element{}, subjectComponent.elements)
+	subjectElement := subjectComponent.elements["ElementA"]
+	assert.IsType(t, Resource{}, subjectElement.resource)
+	assert.Equal(t, "my_test_table", subjectElement.resource.tableName)
 }
 
 func TestEntityFromConfigurationBuiltUsingBuilderContainsPhasesAndTasks(t *testing.T) {
@@ -97,11 +96,11 @@ func TestEntityFromConfigurationBuiltUsingBuilderContainsPhasesAndTasks(t *testi
 	assert.IsType(t, map[string]Component{}, subjectEntity.components)
 	subjectPhase := subjectEntity.components["MyTestComponent1"]
 	assert.Equal(t, "This is a test component", subjectPhase.description)
-	assert.IsType(t, map[string]Part{}, subjectPhase.parts)
-	subjectPart := subjectPhase.parts["PartA"]
+	assert.IsType(t, map[string]Element{}, subjectPhase.elements)
+	subjectElement := subjectPhase.elements["ElementA"]
 
-	assert.IsType(t, Resource{}, subjectPart.resource)
-	assert.Equal(t, "my_test_table", subjectPart.resource.tableName)
+	assert.IsType(t, Resource{}, subjectElement.resource)
+	assert.Equal(t, "my_test_table", subjectElement.resource.tableName)
 }
 
 func TestTasksInConfigurationBuiltUsingBuilderContainsResourceAndSelectionCriteria(t *testing.T) {
@@ -111,23 +110,23 @@ func TestTasksInConfigurationBuiltUsingBuilderContainsResourceAndSelectionCriter
 	assert.IsType(t, map[string]Entity{}, configuration.entities)
 	subjectEntity := configuration.entities["MyTestEntity"]
 	subjectPhase := subjectEntity.components["MyTestComponent1"]
-	partA := subjectPhase.parts["PartA"]
+	elementA := subjectPhase.elements["ElementA"]
 
-	assert.IsType(t, Resource{}, partA.resource)
-	assert.Nil(t, partA.selectionCriteria)
+	assert.IsType(t, Resource{}, elementA.resource)
+	assert.Nil(t, elementA.selectionCriteria)
 
-	partB := subjectPhase.parts["PartB"]
-	assert.IsType(t, Resource{}, partB.resource)
-	assert.NotNil(t, partB.selectionCriteria)
-	assert.IsType(t, &CustomSelectionCriteria{}, partB.selectionCriteria)
+	elementB := subjectPhase.elements["ElementB"]
+	assert.IsType(t, Resource{}, elementB.resource)
+	assert.NotNil(t, elementB.selectionCriteria)
+	assert.IsType(t, &CustomSelectionCriteria{}, elementB.selectionCriteria)
 
-	partC := subjectPhase.parts["PartC"]
-	assert.IsType(t, Resource{}, partC.resource)
-	assert.NotNil(t, partC.selectionCriteria)
-	assert.IsType(t, &IndexedSelectionCriteria{}, partC.selectionCriteria)
+	elementC := subjectPhase.elements["ElementC"]
+	assert.IsType(t, Resource{}, elementC.resource)
+	assert.NotNil(t, elementC.selectionCriteria)
+	assert.IsType(t, &IndexedSelectionCriteria{}, elementC.selectionCriteria)
 
-	partD := subjectPhase.parts["PartD"]
-	assert.IsType(t, Resource{}, partD.resource)
-	assert.NotNil(t, partD.selectionCriteria)
-	assert.IsType(t, &RelatedSelectionCriteria{}, partD.selectionCriteria)
+	elementD := subjectPhase.elements["ElementD"]
+	assert.IsType(t, Resource{}, elementD.resource)
+	assert.NotNil(t, elementD.selectionCriteria)
+	assert.IsType(t, &RelatedSelectionCriteria{}, elementD.selectionCriteria)
 }

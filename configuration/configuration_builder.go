@@ -146,65 +146,65 @@ func (configurationBuilder *BuilderYml) buildComponents(ymlComponents map[string
 	components := make(map[string]Component)
 	for componentName, ymlComponent := range ymlComponents {
 		component := *NewComponent(ymlComponent.Description)
-		if component.parts == nil {
-			component.parts = make(map[string]Part)
+		if component.elements == nil {
+			component.elements = make(map[string]Element)
 		}
 
-		component.parts = configurationBuilder.buildParts(ymlComponent.Parts)
+		component.elements = configurationBuilder.buildElements(ymlComponent.Elements)
 		components[componentName] = component
 	}
 
 	return components
 }
 
-func (configurationBuilder *BuilderYml) buildParts(ymlParts map[string]YmlPart) map[string]Part {
-	parts := make(map[string]Part)
+func (configurationBuilder *BuilderYml) buildElements(ymlElements map[string]YmlElement) map[string]Element {
+	elements := make(map[string]Element)
 
-	for partName, ymlPart := range ymlParts {
-		part := *NewPart(configurationBuilder.configuration.resources[ymlPart.Resource])
+	for elementName, ymlElement := range ymlElements {
+		element := *NewElement(configurationBuilder.configuration.resources[ymlElement.Resource])
 
-		if part.selectionCriteria == "Related" {
+		if element.selectionCriteria == "Related" {
 			relatedSelectionCriteria := NewRelatedSelectionCriteria()
-			part.selectionCriteria = relatedSelectionCriteria
+			element.selectionCriteria = relatedSelectionCriteria
 		}
 
-		parts[partName] = part
+		elements[elementName] = element
 	}
 
-	for partName, ymlPart := range ymlParts {
-		ymlSelectionCriteria := ymlPart.SelectionCriteria
-		part := parts[partName]
+	for elementName, ymlElement := range ymlElements {
+		ymlSelectionCriteria := ymlElement.SelectionCriteria
+		element := elements[elementName]
 		switch ymlSelectionCriteria.Type {
 
 		case "Custom":
 			customSelectionCriteria := NewCustomSelectionCriteria()
 			customSelectionCriteria.criteria = ymlSelectionCriteria.Criteria
-			part.selectionCriteria = customSelectionCriteria
+			element.selectionCriteria = customSelectionCriteria
 
 		case "Index":
 			indexedSelectionCriteria := NewIndexedSelectionCriteria()
-			var relatedParts []Part
-			for _, relatedPartName := range ymlSelectionCriteria.Parts {
-				relatedParts = append(relatedParts, parts[relatedPartName])
+			var relatedElements []Element
+			for _, relatedElementName := range ymlSelectionCriteria.Elements {
+				relatedElements = append(relatedElements, elements[relatedElementName])
 			}
 
-			indexedSelectionCriteria.parts = relatedParts
-			part.selectionCriteria = indexedSelectionCriteria
+			indexedSelectionCriteria.elements = relatedElements
+			element.selectionCriteria = indexedSelectionCriteria
 
 		case "Related":
 			relatedSelectionCriteria := NewRelatedSelectionCriteria()
-			var relatedParts []Part
-			for _, relatedPartName := range ymlSelectionCriteria.Parts {
-				relatedParts = append(relatedParts, parts[relatedPartName])
+			var relatedElements []Element
+			for _, relatedElementName := range ymlSelectionCriteria.Elements {
+				relatedElements = append(relatedElements, elements[relatedElementName])
 			}
 
-			relatedSelectionCriteria.parts = relatedParts
-			part.selectionCriteria = relatedSelectionCriteria
+			relatedSelectionCriteria.elements = relatedElements
+			element.selectionCriteria = relatedSelectionCriteria
 
 		}
 
-		parts[partName] = part
+		elements[elementName] = element
 	}
 
-	return parts
+	return elements
 }

@@ -153,7 +153,7 @@ Entities:
     Components:
       Customers:
         Description: Customers component
-        Parts:
+        Elements:
           Regions:
             Resource: Regions
             SelectionCriteria:
@@ -165,7 +165,7 @@ Entities:
             Resource: Customers
             SelectionCriteria:
               Type: Index
-              Parts:
+              Elements:
                 - Regions
               Index: Region
 
@@ -173,12 +173,12 @@ Entities:
             Resource: CustomerPreferences
             SelectionCriteria:
               Type: Related
-              Parts:
+              Elements:
                 - Customers
 
       Categories:
         Description: Categories component
-        Parts:
+        Elements:
           Regions:
             Resource: Regions
             SelectionCriteria:
@@ -190,7 +190,7 @@ Entities:
             Resource: Categories
             SelectionCriteria:
               Type: Index
-              Parts:
+              Elements:
                 - Regions
               Index: Region
 
@@ -202,7 +202,7 @@ Entities:
           Resource: Products
           SelectionCriteria:
             Type: Related
-            Parts:
+            Elements:
               - Categories
 
       Orders:
@@ -213,14 +213,14 @@ Entities:
           Resource: Orders
           SelectionCriteria:
             Type: Related
-            Parts:
+            Elements:
               - Customers
 
         OrderItems:
           Resource: OrderItems
           SelectionCriteria:
             Type: Related
-            Parts:
+            Elements:
               - Orders
 
       Carts:
@@ -231,14 +231,14 @@ Entities:
           Resource: Carts
           SelectionCriteria:
             Type: Related
-            Parts:
+            Elements:
               - Customers
 
         CartItems:
           Resource: CartItems
           SelectionCriteria:
             Type: Related
-            Parts:
+            Elements:
               - Carts
 
       Payments:
@@ -249,7 +249,7 @@ Entities:
           Resource: Payments
           SelectionCriteria:
             Type: Related
-            Parts:
+            Elements:
               - Orders
 
       Reviews:
@@ -263,6 +263,6 @@ Entities:
           Resource: Reviews
           SelectionCriteria:
             Type: Related
-            Parts:
+            Elements:
               - Customers
               - Products
